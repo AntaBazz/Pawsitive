@@ -1,183 +1,314 @@
 <template>
-  <div class="comment-section d-flex flex-column align-items-center" id="comment">
-    <h2 id ="commenti" class="mb-4">Lasciaci un commento</h2>
 
-    <!-- Alert messaggi -->
-    <div
-      v-if="alertMessage"
-      :class="['alert', 'w-100', 'text-center', `alert-${alertType}`]"
-      style="max-width: 900px;"
-    >
-      {{ alertMessage }}
+  <div id="commenti" class="container">
+    <div class="text-center mb-4">
+      <h2>Comments</h2>
     </div>
+    <div class="comment-section">
+      <!-- New Comment Form -->
+      <div class="mb-4">
+        <div class="d-flex gap-3">
+          <div class="user-avatar-icon">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div class="flex-grow-1">
+            <!-- Name Input -->
+            <input v-model="userName" type="text" class="form-control name-input mb-2" placeholder="Your name"
+              maxlength="50" />
+            <!-- Comment Input -->
+            <textarea v-model="newComment" class="form-control comment-input" rows="3"
+              placeholder="Write a comment..."></textarea>
+            <div class="mt-3 text-end">
+              <button class="btn btn-warning text-white btn-sm mt-3 rounded-pill" @click="addComment"
+                style="padding-left: 1.5rem; padding-right: 1.5rem;">
+                Post comment
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <!-- Form per inserire commento -->
-    <form
-      @submit.prevent="submitComment"
-      class="w-100 mt-4"
-      style="max-width: 900px;"
-    >
-      <input
-        v-model="newAuthor"
-        type="text"
-        class="form-control mb-3"
-        placeholder="Il tuo nome"
-        required
-      />
-      <textarea
-        v-model="newText"
-        class="form-control mb-3"
-        rows="3"
-        placeholder="Il tuo commento"
-        required
-      ></textarea>
-      <div class="d-flex justify-content-center">
-        <button
-          type="submit"
-          class="btn btn-warning text-white btn-sm mt-3 rounded-pill px-4 py-2"
-        >
-          Invia commento
+      <!-- Comments List -->
+      <div class="comments-list">
+        <div v-for="(comment, index) in visibleComments" :key="comment.id" class="comment-box">
+          <div class="d-flex gap-3">
+            <div class="user-avatar-icon">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">{{ comment.name }}</h6>
+                <span class="comment-time">{{ formatTime(comment.createdAt) }}</span>
+              </div>
+              <p class="mb-2">{{ comment.text }}</p>
+              <div class="comment-actions">
+                <a href="#" @click.prevent="toggleReply(index)">
+                  <i class="fa-solid fa-reply"></i> Reply
+                </a>
+              </div>
+
+              <!-- Reply Input -->
+              <div v-if="comment.showReplyBox" class="mt-3">
+                <textarea v-model="comment.replyText" class="form-control comment-input mb-2" rows="2"
+                  placeholder="Write a reply..."></textarea>
+                <div class="text-end">
+                  <button class="btn btn-warning text-white btn-sm mt-3 rounded-pill" @click="postReply(index)" style="padding-left: 1.5rem; padding-right: 1.5rem;">
+                    Post Reply
+                  </button>
+                </div>
+              </div>
+
+              <!-- Replies -->
+              <div class="reply-section mt-3" v-if="comment.replies?.length">
+                <div v-for="(reply, rIdx) in comment.replies" :key="rIdx" class="comment-box">
+                  <div class="d-flex gap-3">
+                    <div class="user-avatar-icon">
+                      <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">{{ reply.name }}</h6>
+                        <span class="comment-time">{{ formatTime(reply.createdAt) }}</span>
+                      </div>
+                      <p class="mb-2">{{ reply.text }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Show More Button -->
+      <div v-if="comments.length > commentsToShow" class="text-center mt-3">
+
+        <button class="btn btn-warning text-white btn-sm mt-3 rounded-pill" @click="showMoreComments"
+          style="padding-left: 1.5rem; padding-right: 1.5rem;">
+          Show more comments
         </button>
-      </div>
-    </form>
 
-      <!-- Titolo sopra i commenti -->
-      <h3
-      v-if="internalComments.length"
-      class="mt-5 mb-3"
-      style="max-width: 900px;"
-    >
-      Commenti precedenti
-    </h3>
-
-    <!-- Lista commenti visibili -->
-    <div
-      v-for="(comment, index) in visibleComments"
-      :key="comment.id || index"
-      class="comment w-100 mb-3 p-3 shadow-sm rounded"
-      style="max-width: 600px;"
-    >
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <strong>{{ comment.author }}</strong>
-        <small class="text-muted">{{ comment.date }}</small>
       </div>
-      <p class="mb-0">{{ comment.text }}</p>
     </div>
-
-    <!-- Bottone carica più -->
-    <button
-  v-if="internalComments.length > visibleCount"
-  @click="loadMoreComments"
-  class="btn btn-warning text-white btn-sm mt-3 rounded-pill px-4 py-2"
-  :disabled="loading"
->
-  Carica più commenti
-  <span
-    v-if="loading"
-    class="spinner-border spinner-border-sm ms-2"
-    role="status"
-    aria-hidden="true"
-  ></span>
-</button>
-
   </div>
 </template>
 
-<script>
-import { db } from "@/firebase";
+<script setup>
+import { ref, onMounted, computed } from 'vue'
+import { db } from '@/firebase'
 import {
   collection,
   addDoc,
-  onSnapshot,
-  query,
+  getDocs,
+  updateDoc,
+  doc,
+  serverTimestamp,
   orderBy,
-} from "firebase/firestore";
+  query
+} from 'firebase/firestore'
 
-export default {
-  name: "MyCommentForm",
-  data() {
-    return {
-      visibleCount: 5,
-      loading: false,
-      newAuthor: "",
-      newText: "",
-      internalComments: [],
-      alertMessage: "",
-      alertType: "success",
-    };
-  },
-  computed: {
-    visibleComments() {
-      return this.internalComments.slice(0, this.visibleCount);
-    },
-  },
-  mounted() {
-    const q = query(collection(db, "comments"), orderBy("date", "desc"));
-    onSnapshot(q, (snapshot) => {
-      this.internalComments = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-    });
-  },
-  methods: {
-    loadMoreComments() {
-      this.loading = true;
-      setTimeout(() => {
-        this.visibleCount += 5;
-        this.loading = false;
-      }, 500);
-    },
-    async submitComment() {
-      const newComment = {
-        author: this.newAuthor.trim(),
-        text: this.newText.trim(),
-        date: new Date().toISOString().slice(0, 10),
-      };
-      if (newComment.author && newComment.text) {
-        try {
-          await addDoc(collection(db, "comments"), newComment);
-          this.alertMessage = "Commento inviato con successo!";
-          this.alertType = "success";
-          this.newAuthor = "";
-          this.newText = "";
-        } catch (error) {
-          console.error("Errore nel salvataggio:", error);
-          this.alertMessage = "Errore durante l'invio del commento.";
-          this.alertType = "danger";
-        }
-        setTimeout(() => {
-          this.alertMessage = "";
-        }, 3000);
-      }
-    },
-  },
-};
+const userName = ref('')
+const newComment = ref('')
+const comments = ref([])
+
+const commentsRef = collection(db, 'comments')
+
+const commentsToShow = ref(5)
+
+// Computed: solo i commenti visibili
+const visibleComments = computed(() => comments.value.slice(0, commentsToShow.value))
+
+// Load comments from Firestore
+const loadComments = async () => {
+  const q = query(commentsRef, orderBy('createdAt', 'desc'))
+  const querySnapshot = await getDocs(q)
+  comments.value = querySnapshot.docs.map((docSnap) => ({
+    id: docSnap.id,
+    ...docSnap.data(),
+    showReplyBox: false,
+    replyText: ''
+  }))
+}
+
+// Add new comment
+const addComment = async () => {
+  if (userName.value.trim() === '' || newComment.value.trim() === '') return
+
+  await addDoc(commentsRef, {
+    name: userName.value.trim(),
+    text: newComment.value.trim(),
+    createdAt: serverTimestamp(),
+    replies: []
+  })
+
+  userName.value = ''
+  newComment.value = ''
+  commentsToShow.value = 5 // resetta paginazione a 5 commenti visibili
+  loadComments()
+}
+
+// Toggle reply input
+const toggleReply = (index) => {
+  comments.value[index].showReplyBox = !comments.value[index].showReplyBox
+}
+
+// Post reply
+const postReply = async (index) => {
+  const replyText = comments.value[index].replyText?.trim()
+  if (!replyText) return
+
+  const commentDocRef = doc(db, 'comments', comments.value[index].id)
+  const currentReplies = comments.value[index].replies || []
+
+  const newReply = {
+    name: userName.value.trim() || 'You',
+    text: replyText,
+    createdAt: new Date()
+  }
+
+  const updatedReplies = [...currentReplies, newReply]
+
+  await updateDoc(commentDocRef, {
+    replies: updatedReplies
+  })
+
+  comments.value[index].replyText = ''
+  comments.value[index].showReplyBox = false
+  loadComments()
+}
+
+// Format time
+const formatTime = (timestamp) => {
+  if (!timestamp) return 'Just now'
+  const date = timestamp.toDate ? timestamp.toDate() : timestamp
+  return date.toLocaleString()
+}
+
+// Show more comments button handler
+const showMoreComments = () => {
+  commentsToShow.value += 5
+}
+
+onMounted(() => {
+  loadComments()
+})
 </script>
 
 <style scoped>
 .comment-section {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 15px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+}
+
+.comment-box {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: transform 0.2s;
+  border: 1px solid #e9ecef;
+}
+
+.comment-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.user-avatar-icon {
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  border-radius: 50%;
+  background: #dee2e6;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 1rem 0;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #6c757d;
 }
 
-.comment {
-  background-color: #fff;
-  box-shadow: 0 0 8px rgb(0 0 0 / 0.1);
+.name-input {
+  border-radius: 20px;
+  padding: 10px 20px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s;
+  width: 100%;
 }
 
-.form-control {
-  font-size: 1rem;
+.name-input:focus {
+  box-shadow: none;
+  border-color: #86b7fe;
 }
 
-.spinner-border {
-  vertical-align: middle;
+.comment-input {
+  border-radius: 20px;
+  padding: 15px 20px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s;
+  width: 100%;
 }
 
-#commenti {
-  padding-top: 80px;
-  margin-top: -80px;
+.comment-input:focus {
+  box-shadow: none;
+  border-color: #86b7fe;
+}
+
+.btn-comment {
+  border-radius: 20px;
+  padding: 8px 25px;
+  background: #0d6efd;
+  border: none;
+  transition: all 0.3s;
+}
+
+.btn-comment:hover {
+  background: #0b5ed7;
+  transform: translateY(-1px);
+}
+
+.comment-actions {
+  font-size: 0.9rem;
+}
+
+.comment-actions a {
+  color: #6c757d;
+  text-decoration: none;
+  margin-right: 15px;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.comment-actions a:hover {
+  color: #ffc107;
+}
+
+.comment-time {
+  color: #adb5bd;
+  font-size: 0.85rem;
+}
+
+.reply-section {
+  margin-left: 60px;
+  border-left: 2px solid #e9ecef;
+  padding-left: 20px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+
+/* Previene l'overflow del nome */
+.comment-box h6,
+.comment-box p,
+.name-input,
+.comment-input {
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 </style>

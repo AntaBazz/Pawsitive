@@ -1,10 +1,10 @@
 <template>
   <header class="jumbotron d-flex align-items-center justify-content-center text-center">
     <div class="container">
-      <h1 class="display-4">Benvenuti su Pawsitive</h1>
+      <h1 class="display-4">Welcome to Pawsitive</h1>
        <p class="lead">
-        Dai una seconda possibilità. Qui troverai cani, gatti e altri animali in cerca di una famiglia che li ami per sempre.
-        Ogni adozione è una storia a lieto fine. Inizia la tua oggi!
+        Give them a second chance. Here you will find dogs, cats and other animals looking for a family that loves them forever.
+        Every adoption is a happy ending story. Start yours today!
       </p> 
       <!-- <a href="#contact" class="btn btn-primary btn-lg">Contattaci</a> -->
     </div>

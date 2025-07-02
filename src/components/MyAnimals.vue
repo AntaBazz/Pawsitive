@@ -3,7 +3,7 @@ MY ANIMALS FILTRI FUNIONANTI MA NON FUNZIONA PAGINAZIONE
 <template>
   <section id="animali" class="container my-5">
     <div class="text-center mb-4">
-      <h2>I nostri animali</h2>
+      <h2>Our paws</h2>
     </div>
 
     <div class="d-flex flex-column flex-lg-row gap-4">
@@ -18,7 +18,8 @@ MY ANIMALS FILTRI FUNIONANTI MA NON FUNZIONA PAGINAZIONE
           </div>
           <div class="mb-2">
             <label class="form-label">Breed</label>
-            <input v-model="filters.breed" type="text" class="form-control" placeholder="Labrador, Golden Retriever..." />
+            <input v-model="filters.breed" type="text" class="form-control"
+              placeholder="Labrador, Golden Retriever..." />
           </div>
           <div class="mb-2">
             <label class="form-label">Age</label>
@@ -60,6 +61,8 @@ MY ANIMALS FILTRI FUNIONANTI MA NON FUNZIONA PAGINAZIONE
             <span class="visually-hidden">Loading...</span>
           </div>
         </div>
+
+        <!-- PAGINAZIONE -->
 
         <nav aria-label="Page navigation" class="my-4 d-flex justify-content-center">
           <ul class="pagination justify-content-center">
@@ -248,4 +251,46 @@ export default {
   transform: translate(-50%, -50%);
   z-index: 10;
 }
+
+.pagination {
+  border-radius: 0.8rem;
+  overflow: hidden;
+  border: 1px solid #dee2e6; /* bordo esterno */
+  padding: 0;
+  margin: 0;
+  display: flex;
+}
+
+.pagination .page-item {
+  border: none; /* niente bordo qui */
+}
+
+.pagination .page-link {
+  border: none !important;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0.375rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  
+  /* Separatore a sinistra tranne sul primo bottone */
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Rimuovi il bordo sinistro dal primo bottone */
+.pagination .page-item:first-child .page-link {
+  border-left: none;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #ffc107 !important;
+  color: #ffffff;
+  border-radius: 0;
+}
+
+
+
 </style>

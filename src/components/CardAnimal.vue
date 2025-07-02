@@ -1,29 +1,16 @@
 <template>
-  <div class="card h-100 shadow-sm rounded overflow-hidden">
+  <div class="card h-100 shadow-sm overflow-hidden">
     <div class="position-relative">
       <img
         :src="(animal && animal.photos && animal.photos.length) ? animal.photos[0].medium : '/images/ImmagineDiSostituzione.jpeg'"
         :alt="animal.name || 'Immagine animale non disponibile'" class="animal-img rounded-top" />
-
-      <!-- Cuore -->
-      <!-- <button
-        @click="toggleFavorite"
-        class="btn btn-light d-flex justify-content-center align-items-center position-absolute top-0 end-0 m-2 rounded-circle p-0"
-        style="width: 40px; height: 40px; line-height: 0;">
-        <i
-          class="fa-heart"
-          :class="isFavorited ? 'fas text-danger' : 'far text-muted'"
-          style="font-size: 18px;"
-        ></i>
-      </button> -->
-
 
     </div>
 
     <div class="card-body d-flex flex-column">
       <div class="d-flex justify-content-between align-items-start mb-2">
         <h6 class="card-title fw-bold">{{ animal.name }}</h6>
-        <span class="badge bg-primary">{{ animal.type }}</span>
+        <span class="badge bg-primary" style="border-radius: 1rem; font-weight: normal;">{{ animal.type }}</span>
       </div>
 
       <div class="badge-container mb-3">
@@ -36,6 +23,7 @@
           <i class="fa-solid fa-venus-mars"></i>
           {{ animal.gender }}
         </span>
+
         <span class="badge-custom small d-inline-block badge-location">
           <i class="fa-solid fa-location-dot"></i>
           {{ animal.contact.address.city }}, {{ animal.contact.address.state }}
@@ -145,9 +133,6 @@ export default {
 
     },
 
-    /*toggleFavorite() {
-      this.isFavorited = !this.isFavorited;
-    },*/
 
     closeModal() {
       this.showModal = false;
@@ -172,7 +157,7 @@ export default {
 }
 
 .card {
-  border-radius: 0.5rem;
+  border-radius: 1rem !important;
   overflow: hidden;
   /* taglia tutto ciò che esce dagli angoli arrotondati */
 }
@@ -188,20 +173,15 @@ export default {
   color: #6c757d;
   white-space: nowrap;
   padding: 0.25em 0.5em;
-  border-radius: 0.25rem;
+  border-radius: 1rem;
   font-size: 0.8rem;
-}
-
-.second-badge {
+  font-size: 1rem; /* imposta una dimensione fissa per tutte le icone */
+  width: auto;    /* larghezza fissa per allinearle */
+  height: auto;   /* altezza fissa */
   display: inline-block;
-  margin-top: 0.25rem;
-  clear: left;
+  vertical-align: middle;
+  display: inline-block;
+  
 }
 
-.badge-location {
-  background-color: #f8f9fa;
-  color: #6c757d;
-  white-space: nowrap;
-  padding: 0.25em 0.5em;
-}
 </style>

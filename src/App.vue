@@ -6,12 +6,7 @@
     <MyNavbar />
     <MyJumbotron />
     <section id="animali" class="container my-5"> <MyAnimals /> </section>
-    <!-- <MyServices /> -->
-    <!-- <MyPortfolio /> -->
-    <!-- <MyAbout /> -->
-    <!-- <MyTeam /> -->
-    <!-- <MyContact /> --> 
-    <section id="contact"> <MyCommentForm :comments="comments" /> </section>
+    <section id="commenti"> <MyCommentForm :comments="comments" /> </section>
     <MyFooter /> 
     </div>
   </div> 
