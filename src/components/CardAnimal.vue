@@ -175,13 +175,15 @@ export default {
   padding: 0.25em 0.5em;
   border-radius: 1rem;
   font-size: 0.8rem;
-  font-size: 1rem; /* imposta una dimensione fissa per tutte le icone */
-  width: auto;    /* larghezza fissa per allinearle */
-  height: auto;   /* altezza fissa */
+  font-size: 1rem;
+  /* imposta una dimensione fissa per tutte le icone */
+  width: auto;
+  /* larghezza fissa per allinearle */
+  height: auto;
+  /* altezza fissa */
   display: inline-block;
   vertical-align: middle;
   display: inline-block;
-  
-}
 
+}
 </style>

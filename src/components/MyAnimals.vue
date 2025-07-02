@@ -1,5 +1,3 @@
-MY ANIMALS FILTRI FUNIONANTI MA NON FUNZIONA PAGINAZIONE
-
 <template>
   <section id="animali" class="container my-5">
     <div class="text-center mb-4">
@@ -46,12 +44,21 @@ MY ANIMALS FILTRI FUNIONANTI MA NON FUNZIONA PAGINAZIONE
       <section class="col-12 col-lg-9" style="position: relative;">
         <div class="grid-wrapper" :class="{ 'loading-overlay': loading }">
           <div class="row g-3 fixed-height-grid">
-            <div class="col-12 col-md-4 d-flex" v-for="animal in animals" :key="animal.id">
-              <CardAnimal :animal="animal" class="animal-card flex-fill" />
-            </div>
 
-            <div v-for="n in limit - animals.length" :key="'placeholder-' + n" class="col-12 col-md-4 d-flex">
-              <div class="animal-card flex-fill invisible"></div>
+            <template v-if="!loading && animals.length > 0">
+              <div class="col-12 col-md-4 d-flex" v-for="animal in animals" :key="animal.id">
+                <CardAnimal :animal="animal" class="animal-card flex-fill" />
+              </div>
+
+              <div v-for="n in limit - animals.length" :key="'placeholder-' + n" class="col-12 col-md-4 d-flex">
+                <div class="animal-card flex-fill invisible"></div>
+              </div>
+            </template>
+
+            <div v-else-if="!loading && filterError" class="col-12">
+              <div class="alert alert-warning text-center w-100">
+                Filtro non valido: nessun animale trovato.
+              </div>
             </div>
           </div>
         </div>
@@ -113,6 +120,7 @@ export default {
       },
       limit: 9,
       loading: false,
+      filterError: false
     };
   },
 
@@ -130,6 +138,7 @@ export default {
         age: '',
         gender: '',
       };
+      this.filterError = false;
       this.applyFiltersAndReset();
     },
 
@@ -150,43 +159,14 @@ export default {
 
         this.filteredAnimals = data.animals;
         this.totalPages = data.pagination.total_pages;
+        this.filterError = data.animals.length === 0;
         this.loading = false;
       } catch (e) {
         console.error(e);
+        this.filteredAnimals = [];
+        this.filterError = true;
         this.loading = false;
       }
-    },
-
-
-    applyFilters() {
-      const { type, breed, age, gender } = this.filters;
-
-      // Controlla se i filtri sono tutti vuoti
-      const noFilters =
-        !type.trim() &&
-        !breed.trim() &&
-        !age.trim() &&
-        !gender.trim();
-
-      if (noFilters) {
-        // Nessun filtro: mostra tutti gli animali
-        this.filteredAnimals = this.allAnimals;
-      } else {
-        // Altrimenti applica il filtro come fai ora
-        this.filteredAnimals = this.allAnimals.filter(animal => {
-          const matchesType = type ? animal.type?.toLowerCase().includes(type.toLowerCase()) : true;
-          const matchesBreed = breed ? animal.breed?.toLowerCase().includes(breed.toLowerCase()) : true;
-          const matchesAge = age ? animal.age?.toLowerCase().includes(age.toLowerCase()) : true;
-          const matchesGender = gender ? animal.gender === gender : true;
-
-          return matchesType && matchesBreed && matchesAge && matchesGender;
-        });
-      }
-
-      // aggiorna paginazione
-      this.totalPages = Math.max(1, Math.ceil(this.filteredAnimals.length / this.limit));
-
-      console.log('Filtro applicato:', this.filters, 'Animali filtrati:', this.filteredAnimals.length, 'Pagine totali:', this.totalPages);
     },
 
     applyFiltersAndReset() {
@@ -194,13 +174,11 @@ export default {
       this.fetchAnimals();
     },
 
-
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page;
         this.fetchAnimals();
       }
-
     }
   },
 
@@ -255,14 +233,14 @@ export default {
 .pagination {
   border-radius: 0.8rem;
   overflow: hidden;
-  border: 1px solid #dee2e6; /* bordo esterno */
+  border: 1px solid #dee2e6;
   padding: 0;
   margin: 0;
   display: flex;
 }
 
 .pagination .page-item {
-  border: none; /* niente bordo qui */
+  border: none;
 }
 
 .pagination .page-link {
@@ -275,12 +253,9 @@ export default {
   justify-content: center;
   width: 100%;
   height: 100%;
-  
-  /* Separatore a sinistra tranne sul primo bottone */
   border-left: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* Rimuovi il bordo sinistro dal primo bottone */
 .pagination .page-item:first-child .page-link {
   border-left: none;
 }
@@ -290,7 +265,4 @@ export default {
   color: #ffffff;
   border-radius: 0;
 }
-
-
-
 </style>

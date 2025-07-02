@@ -5,6 +5,9 @@
       <h2>Comments</h2>
     </div>
     <div class="comment-section">
+
+
+
       <!-- New Comment Form -->
       <div class="mb-4">
         <div class="d-flex gap-3">
@@ -23,9 +26,17 @@
                 style="padding-left: 1.5rem; padding-right: 1.5rem;">
                 Post comment
               </button>
+
+              <!-- Success Message -->
+
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Success Message -->
+      <div v-if="successMessage" class="alert alert-success text-center mb-3" role="alert">
+        {{ successMessage }}
       </div>
 
       <!-- Comments List -->
@@ -33,7 +44,7 @@
         <div v-for="(comment, index) in visibleComments" :key="comment.id" class="comment-box">
           <div class="d-flex gap-3">
             <div class="user-avatar-icon">
-              <i class="fa-solid fa-user"></i>
+              <i class="fa-solid fa-user"></i>  
             </div>
             <div class="flex-grow-1">
               <div class="d-flex justify-content-between align-items-center mb-2">
@@ -52,7 +63,8 @@
                 <textarea v-model="comment.replyText" class="form-control comment-input mb-2" rows="2"
                   placeholder="Write a reply..."></textarea>
                 <div class="text-end">
-                  <button class="btn btn-warning text-white btn-sm mt-3 rounded-pill" @click="postReply(index)" style="padding-left: 1.5rem; padding-right: 1.5rem;">
+                  <button class="btn btn-warning text-white btn-sm mt-3 rounded-pill" @click="postReply(index)"
+                    style="padding-left: 1.5rem; padding-right: 1.5rem;">
                     Post Reply
                   </button>
                 </div>
@@ -112,6 +124,8 @@ const userName = ref('')
 const newComment = ref('')
 const comments = ref([])
 
+const successMessage = ref('') // ✅ Messaggio di conferma
+
 const commentsRef = collection(db, 'comments')
 
 const commentsToShow = ref(5)
@@ -119,7 +133,7 @@ const commentsToShow = ref(5)
 // Computed: solo i commenti visibili
 const visibleComments = computed(() => comments.value.slice(0, commentsToShow.value))
 
-// Load comments from Firestore
+// Caricamento commenti da Firestore
 const loadComments = async () => {
   const q = query(commentsRef, orderBy('createdAt', 'desc'))
   const querySnapshot = await getDocs(q)
@@ -131,7 +145,7 @@ const loadComments = async () => {
   }))
 }
 
-// Add new comment
+// Aggiunta nuovo commento
 const addComment = async () => {
   if (userName.value.trim() === '' || newComment.value.trim() === '') return
 
@@ -144,16 +158,21 @@ const addComment = async () => {
 
   userName.value = ''
   newComment.value = ''
-  commentsToShow.value = 5 // resetta paginazione a 5 commenti visibili
-  loadComments()
+  commentsToShow.value = 5
+  await loadComments()
+
+  successMessage.value = 'Comment posted successfully!' // ✅ Mostra messaggio
+  setTimeout(() => {
+    successMessage.value = ''
+  }, 3000)
 }
 
-// Toggle reply input
+// Mostra/nascondi box di risposta
 const toggleReply = (index) => {
   comments.value[index].showReplyBox = !comments.value[index].showReplyBox
 }
 
-// Post reply
+// Pubblica risposta
 const postReply = async (index) => {
   const replyText = comments.value[index].replyText?.trim()
   if (!replyText) return
@@ -178,14 +197,14 @@ const postReply = async (index) => {
   loadComments()
 }
 
-// Format time
+// Formatta timestamp
 const formatTime = (timestamp) => {
   if (!timestamp) return 'Just now'
   const date = timestamp.toDate ? timestamp.toDate() : timestamp
   return date.toLocaleString()
 }
 
-// Show more comments button handler
+// Mostra più commenti
 const showMoreComments = () => {
   commentsToShow.value += 5
 }
@@ -194,6 +213,7 @@ onMounted(() => {
   loadComments()
 })
 </script>
+
 
 <style scoped>
 .comment-section {
@@ -310,5 +330,13 @@ onMounted(() => {
 .comment-input {
   word-break: break-word;
   overflow-wrap: break-word;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: 1px solid #c3e6cb;
 }
 </style>
