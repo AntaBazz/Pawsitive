@@ -6,8 +6,11 @@ const app = express();
 const PORT = 4000;
 
 // Chiavi dell'API
-const PETFINDER_KEY = 'Vva0crwQoACtw6Tr5cbvVMI0Mpj9NLyOA63zg3dnEK0DC1E2Q5';
-const PETFINDER_SECRET = 'nuIVximoZVCv8Zg45l9tbAmCSiiQkYRIB4oOAY4O';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const PETFINDER_KEY = process.env.PETFINDER_KEY;
+const PETFINDER_SECRET = process.env.PETFINDER_SECRET;
 
 app.use(cors());
 
