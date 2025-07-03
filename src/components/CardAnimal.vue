@@ -17,17 +17,17 @@
       </div>
 
       <div class="badge-container mb-3">
-        <span class="badge-custom small d-inline-block">
+        <span class="badge-char small d-inline-block">
           <i class="fa-solid fa-paw me-1"></i>
           {{ animal.breeds.primary }}
         </span>
 
-        <span class="badge-custom small d-inline-block second-badge">
+        <span class="badge-char small d-inline-block second-badge">
           <i class="fa-solid fa-venus-mars"></i>
           {{ animal.gender }}
         </span>
 
-        <span class="badge-custom small d-inline-block badge-location">
+        <span class="badge-char small d-inline-block badge-location">
           <i class="fa-solid fa-location-dot"></i>
           {{ animal.contact.address.city }}, {{ animal.contact.address.state }}
         </span>
@@ -57,7 +57,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .animal-img {
   width: 100%;
   height: 180px;
@@ -79,7 +79,7 @@ export default {
   gap: 0.5rem;
 }
 
-.badge-custom {
+.badge-char {
   background-color: #f8f9fa;
   color: #6c757d;
   white-space: nowrap;
