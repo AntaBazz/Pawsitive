@@ -2,11 +2,10 @@
   <header class="jumbotron d-flex align-items-center justify-content-center text-center">
     <div class="container">
       <h1 class="display-4">Welcome to Pawsitive</h1>
-       <p class="lead">
-        Give them a second chance. Here you will find dogs, cats and other animals looking for a family that loves them forever.
-        Every adoption is a happy ending story. Start yours today!
-      </p> 
-      <!-- <a href="#contact" class="btn btn-primary btn-lg">Contattaci</a> -->
+      <p class="lead">
+        Give them a second chance. Here you will find dogs, cats and other animals looking for a family that loves them
+        forever. Every adoption is a happy ending story. Start yours today!
+      </p>
     </div>
   </header>
 </template>

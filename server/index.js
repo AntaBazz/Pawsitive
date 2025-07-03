@@ -84,7 +84,7 @@ app.get('/api/animals', async (req, res) => {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 
-    //se il token è scaduto, riprova con uno nuovo
+    // Se il token è scaduto, riprova con uno nuovo
     if (response.status === 401) {
       accessToken = await getAccessToken(true);
 
@@ -115,15 +115,13 @@ app.get('/api/animals', async (req, res) => {
 
 // Endpoint per ottenere i dettagli di un animale specifico tramite ID
 
-//SCRIPT VECCHIO
-// 
 app.get('/api/oneanimal/:id', async (req, res) => {
-  console.log("Ciao");
+  //console.log("Ciao");  //debug per capire se l'endpoint è stato raggiunto.
   const { id } = req.params;
 
   try {
     let accessToken = await getAccessToken();
-    console.log("Ciao");
+    //console.log("Ciao"); //debug per capire se l'endpoint è stato raggiunto.
 
     let response = await fetch(`https://api.petfinder.com/v2/animals/${id}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -133,7 +131,6 @@ app.get('/api/oneanimal/:id', async (req, res) => {
     if (response.status === 401) {
       accessToken = await getAccessToken(true);
     
-
       response = await fetch(`https://api.petfinder.com/v2/animals/${id}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
@@ -141,9 +138,9 @@ app.get('/api/oneanimal/:id', async (req, res) => {
 
     const data = await response.json();
     
-    console.log("Risposta completa animal:", JSON.stringify(data.animal, null, 2));
-console.log("Descrizione completa:", data.animal.description);
-console.log("Lunghezza descrizione:", data.animal.description?.length);
+    //console.log("Risposta completa animal:", JSON.stringify(data.animal, null, 2)); // Debug per controllare il contenuto reale dell'oggetto restituito da Petfinder.
+    //console.log("Descrizione completa:", data.animal.description);
+    //console.log("Lunghezza descrizione:", data.animal.description?.length);
 
 
     if (!response.ok) {
@@ -166,47 +163,3 @@ app.listen(PORT, () => {
 });
 
 
-
-
-
-
-//SCRIPT NUOVO
-
-/*app.get('/api/oneanimal/:id', async (req, res) => {
-  const { id } = req.params;
-  console.log("Ricevuta richiesta per id:", id);
-
-  try {
-    let accessToken = await getAccessToken();
-    console.log("Token ottenuto:", accessToken ? "OK" : "MANCANTE");
-
-    let response = await fetch(`https://api.petfinder.com/v2/animals/${id}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    console.log("Risposta API status:", response.status);
-
-    if (response.status === 401) {
-      console.log("Token scaduto, rinnovo...");
-      accessToken = await getAccessToken(true);
-
-      response = await fetch(`https://api.petfinder.com/v2/animals/${id}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      console.log("Risposta API dopo rinnovo token:", response.status);
-    }
-
-    const data = await response.json();
-    console.log("Dati ricevuti:", data);
-
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data.error || 'Errore fetch Petfinder' });
-    }
-
-    console.log("Descrizione completa:", data.animal.description);  // <- stampa descrizione
-
-    return res.json(data.animal);
-  } catch (err) {
-    console.error('Errore server /api/animals/:id:', err.message || err);
-    return res.status(500).json({ error: 'Errore interno server' });
-  }
-});*/

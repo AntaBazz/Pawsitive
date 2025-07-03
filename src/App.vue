@@ -3,13 +3,17 @@
 <template>
   <div id="home">
     <div id="app">
-    <MyNavbar />
-    <MyJumbotron />
-    <section id="animali" class="container my-5"> <MyAnimals /> </section>
-    <section id="commenti"> <MyCommentForm :comments="comments" /> </section>
-    <MyFooter /> 
+      <MyNavbar />
+      <MyJumbotron />
+      <section id="animali" class="container my-5">
+        <MyAnimals />
+      </section>
+      <section id="commenti">
+        <MyCommentForm :comments="comments" />
+      </section>
+      <MyFooter />
     </div>
-  </div> 
+  </div>
 </template>
 
 <script>

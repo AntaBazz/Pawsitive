@@ -44,7 +44,7 @@
         <div v-for="(comment, index) in visibleComments" :key="comment.id" class="comment-box">
           <div class="d-flex gap-3">
             <div class="user-avatar-icon">
-              <i class="fa-solid fa-user"></i>  
+              <i class="fa-solid fa-user"></i>
             </div>
             <div class="flex-grow-1">
               <div class="d-flex justify-content-between align-items-center mb-2">

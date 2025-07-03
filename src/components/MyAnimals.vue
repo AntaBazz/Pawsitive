@@ -1,5 +1,6 @@
 <template>
   <section id="animali" class="container my-5">
+    
     <div class="text-center mb-4">
       <h2>Our paws</h2>
     </div>
@@ -55,7 +56,7 @@
               </div>
             </template>
 
-            <div v-else-if="!loading && filterError" class="col-12" >
+            <div v-else-if="!loading && filterError" class="col-12">
               <div class="alert alert-warning text-center w-100">
                 Invalid filter: no animals found.
               </div>
