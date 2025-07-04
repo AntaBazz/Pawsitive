@@ -37,7 +37,7 @@
         {{ animal.description }}
       </p>
 
-      <!-- Bottone link per aprire il profilo esterno -->
+      <!-- Bottone al link per aprire il profilo esterno -->
       <a
         :href="animal.url"
         target="_blank"

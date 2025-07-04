@@ -153,7 +153,7 @@ export default {
           ...this.filters
         });
 
-        const res = await fetch(`http://localhost:4000/api/animals?${params.toString()}`);
+        const res = await fetch(`http://192.168.1.187:4000/api/animals?${params.toString()}`);
         if (!res.ok) throw new Error('Errore nel fetch degli animali');
 
         const data = await res.json();
